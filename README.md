@@ -1,58 +1,58 @@
-# Rezept-Konverter
+# Recipe Converter
 
-Konvertiert Rezepte im Textformat in das schema.org/Recipe JSON-Format.
+Converts recipes in text format to schema.org/Recipe JSON format.
 
-## Funktionen
+## Features
 
-- ✅ Konvertiert Textdateien in strukturierte JSON-Rezepte
-- ✅ Erkennt automatisch Portionsangaben (z.B. "für 4 Personen")
-- ✅ Erstellt separate Verzeichnisse für jedes Rezept
-- ✅ Unterstützt schema.org/Recipe Standard
-- ✅ Verarbeitet einzelne oder mehrere Dateien
-- ✅ Bereinigt Verzeichnisnamen automatisch
+- ✅ Converts text files to structured JSON recipes
+- ✅ Automatically detects serving information (e.g., "für 4 Personen")
+- ✅ Creates separate directories for each recipe
+- ✅ Supports schema.org/Recipe standard
+- ✅ Processes single or multiple files
+- ✅ Automatically cleans directory names
 
 ## Installation
 
-Keine zusätzlichen Abhängigkeiten erforderlich. Das Script verwendet nur Python Standard-Bibliotheken.
+No additional dependencies required. The script uses only Python standard libraries.
 
-**Voraussetzungen:**
-- Python 3.6 oder höher
+**Requirements:**
+- Python 3.6 or higher
 
-## Verwendung
+## Usage
 
-### Grundlegende Verwendung
+### Basic Usage
 
 ```bash
-python3 recipe_converter.py <Rezeptdatei.txt>
+python3 recipe_converter.py <recipe_file.txt>
 ```
 
-### Mehrere Dateien konvertieren
+### Convert Multiple Files
 
 ```bash
 python3 recipe_converter.py rezept1.txt rezept2.txt rezept3.txt
 ```
 
-### Alle Rezepte in einem Verzeichnis
+### All Recipes in a Directory
 
 ```bash
 python3 recipe_converter.py rezepte/
 ```
 
-### Mit Wildcards
+### With Wildcards
 
 ```bash
 python3 recipe_converter.py rezepte/*.txt
 ```
 
-### Eigenes Ausgabeverzeichnis
+### Custom Output Directory
 
 ```bash
 python3 recipe_converter.py rezept.txt --output meine_rezepte
 ```
 
-## Format der Eingabedateien
+## Input File Format
 
-Die Textdateien sollten folgendes Format haben:
+The text files should have the following format (in German):
 
 ```
 Rezeptname [optional: für X Personen]
@@ -66,7 +66,7 @@ Zubereitung:
 - Anweisung 3
 ```
 
-### Beispiel
+### Example
 
 ```
 Apfelkuchen für 4 Personen
@@ -84,14 +84,14 @@ Zubereitung:
 - Bei 180°C 40 Minuten backen
 ```
 
-## Ausgabeformat
+## Output Format
 
-Das Script erstellt für jedes Rezept:
+The script creates for each recipe:
 
-1. Ein Unterverzeichnis mit dem Rezeptnamen (bereinigte Version)
-2. Darin eine `recipe.json` im schema.org/Recipe Format
+1. A subdirectory with the recipe name (cleaned version)
+2. A `recipe.json` file in schema.org/Recipe format
 
-### Verzeichnisstruktur
+### Directory Structure
 
 ```
 converted/
@@ -102,7 +102,7 @@ converted/
 └── ...
 ```
 
-### JSON-Struktur
+### JSON Structure
 
 ```json
 {
@@ -140,33 +140,33 @@ converted/
 }
 ```
 
-## Besondere Funktionen
+## Special Features
 
-### Automatische Portionserkennung
+### Automatic Serving Detection
 
-Das Script erkennt automatisch Portionsangaben in verschiedenen Formaten:
+The script automatically recognizes serving information in various German formats:
 - "für 4 Personen"
 - "4 Personen"
 - "4 Portionen"
 - "ergibt 6 Portionen"
 
-Diese werden aus dem Namen extrahiert und in `recipeYield` gespeichert.
+These are extracted from the name and stored in `recipeYield`.
 
-### Verzeichnisname-Bereinigung
+### Directory Name Cleaning
 
-Sonderzeichen, die in Dateinamen nicht erlaubt sind, werden automatisch durch Unterstriche ersetzt:
+Special characters not allowed in file names are automatically replaced with underscores:
 - `< > : " / \ | ? *` → `_`
 
-### Flexible Zutatenformate
+### Flexible Ingredient Formats
 
-Das Script akzeptiert Zutaten mit oder ohne Mengenangaben:
+The script accepts ingredients with or without quantity specifications:
 - ✅ `200 g Mehl`
 - ✅ `2 Stück Eier`
 - ✅ `Salz nach Geschmack`
 
-## Fehlerbehandlung
+## Error Handling
 
-Das Script gibt informative Fehlermeldungen aus und zeigt am Ende eine Zusammenfassung:
+The script provides informative error messages and shows a summary at the end:
 
 ```
 ============================================================
@@ -177,17 +177,13 @@ Konvertierung abgeschlossen:
 ============================================================
 ```
 
-## Tipps
+## Tips
 
-1. **Portionsangaben**: Platzieren Sie diese im Rezeptnamen (z.B. "Lasagne für 6 Personen") oder in der ersten Zutat
-2. **Leerzeilen**: Diese werden automatisch ignoriert
-3. **Bindestrich**: Können bei Zutaten und Anweisungen verwendet werden oder weggelassen werden
-4. **Encoding**: Dateien sollten UTF-8 kodiert sein für korrekte Umlaute
+1. **Serving information**: Place this in the recipe name (e.g., "Lasagne für 6 Personen") or in the first ingredient
+2. **Empty lines**: These are automatically ignored
+3. **Dashes**: Can be used with ingredients and instructions or omitted
+4. **Encoding**: Files should be UTF-8 encoded for correct umlauts
 
-## Disclaimer
+## License
 
-Keine Garantie für korrekte und fehlerfreie Funktion. Backups sind grundsätzlich Pflicht.
-
-## Lizenz
-
-Dieses Script ist frei verfügbar unter der GPL v3.
+This script is freely available for use and modification.

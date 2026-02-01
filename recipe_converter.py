@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Rezept-Konverter: Konvertiert Textdateien in schema.org/Recipe JSON-Format
+Recipe Converter: Converts text files to schema.org/Recipe JSON format
 """
 
 import json
@@ -15,15 +15,15 @@ from typing import Dict, List, Optional
 
 def extract_servings(text: str) -> tuple[str, Optional[int]]:
     """
-    Extrahiert Portionsangaben aus dem Text.
+    Extracts serving information from text.
     
     Args:
-        text: Text, der möglicherweise Portionsangaben enthält
+        text: Text that may contain serving information
         
     Returns:
-        Tuple aus (bereinigter Text, Anzahl Portionen)
+        Tuple of (cleaned text, number of servings)
     """
-    # Muster für Portionsangaben
+    # Patterns for German serving information
     patterns = [
         r'für\s+(\d+)\s+Person(?:en)?',
         r'(\d+)\s+Person(?:en)?',
@@ -35,7 +35,7 @@ def extract_servings(text: str) -> tuple[str, Optional[int]]:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
             servings = int(match.group(1))
-            # Entferne die Portionsangabe aus dem Text
+            # Remove serving information from text
             cleaned_text = re.sub(pattern, '', text, flags=re.IGNORECASE).strip()
             return cleaned_text, servings
     
@@ -44,20 +44,20 @@ def extract_servings(text: str) -> tuple[str, Optional[int]]:
 
 def parse_recipe_file(filepath: Path) -> Dict:
     """
-    Parst eine Rezept-Textdatei und extrahiert die Informationen.
+    Parses a recipe text file and extracts information.
     
     Args:
-        filepath: Pfad zur Rezept-Textdatei
+        filepath: Path to the recipe text file
         
     Returns:
-        Dictionary mit den extrahierten Rezeptdaten
+        Dictionary with extracted recipe data
     """
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
     
     lines = content.split('\n')
     
-    # Initialisiere Variablen
+    # Initialize variables
     recipe_name = ""
     ingredients = []
     instructions = []
@@ -70,16 +70,16 @@ def parse_recipe_file(filepath: Path) -> Dict:
         if not line:
             continue
         
-        # Erste nicht-leere Zeile ist der Rezeptname
+        # First non-empty line is the recipe name
         if not recipe_name and not line.lower().startswith(('zutaten:', 'zubereitung:')):
             recipe_name = line
-            # Prüfe ob Portionsangabe im Namen
+            # Check if serving information in name
             recipe_name, extracted_servings = extract_servings(recipe_name)
             if extracted_servings:
                 servings = extracted_servings
             continue
         
-        # Erkenne Abschnitte
+        # Recognize sections (German keywords)
         if line.lower().startswith('zutaten:'):
             current_section = 'ingredients'
             continue
@@ -87,28 +87,28 @@ def parse_recipe_file(filepath: Path) -> Dict:
             current_section = 'instructions'
             continue
         
-        # Füge Inhalt zum aktuellen Abschnitt hinzu
+        # Add content to current section
         if current_section == 'ingredients':
-            # Entferne führende Bindestriche und Leerzeichen
+            # Remove leading dashes and spaces
             ingredient = line.lstrip('- ').strip()
             if ingredient:
-                # Prüfe ob Portionsangabe in Zutat
+                # Check if serving information in ingredient
                 ingredient, extracted_servings = extract_servings(ingredient)
                 if extracted_servings:
                     servings = extracted_servings
                 ingredients.append(ingredient)
         
         elif current_section == 'instructions':
-            # Behalte Bindestriche für Anweisungen
+            # Keep dashes for instructions
             instruction = line.strip()
             if instruction:
                 instructions.append(instruction)
     
-    # Erstelle recipe.json Struktur
+    # Create recipe.json structure
     now = datetime.now()
     date_str = now.strftime("%Y-%m-%dT%H:%M:%S+00:00")
     
-    # Erstelle einen Verzeichnisnamen (bereinige Sonderzeichen)
+    # Create directory name (clean special characters)
     dir_name = re.sub(r'[<>:"/\\|?*]', '_', recipe_name)
     dir_name = dir_name.strip('. ')
     
@@ -147,17 +147,17 @@ def parse_recipe_file(filepath: Path) -> Dict:
 
 def convert_recipes(input_paths: List[str], output_dir: str = "converted"):
     """
-    Konvertiert Rezept-Textdateien in JSON-Format.
+    Converts recipe text files to JSON format.
     
     Args:
-        input_paths: Liste von Pfaden zu Textdateien oder Verzeichnissen
-        output_dir: Ausgabeverzeichnis (Standard: "converted")
+        input_paths: List of paths to text files or directories
+        output_dir: Output directory (default: "converted")
     """
-    # Erstelle Ausgabeverzeichnis
+    # Create output directory
     output_path = Path(output_dir)
     output_path.mkdir(exist_ok=True)
     
-    # Sammle alle Textdateien
+    # Collect all text files
     files_to_process = []
     for input_path in input_paths:
         path = Path(input_path)
@@ -165,7 +165,7 @@ def convert_recipes(input_paths: List[str], output_dir: str = "converted"):
         if path.is_file() and path.suffix.lower() in ['.txt', '.text']:
             files_to_process.append(path)
         elif path.is_dir():
-            # Finde alle .txt Dateien im Verzeichnis
+            # Find all .txt files in directory
             files_to_process.extend(path.glob('*.txt'))
             files_to_process.extend(path.glob('*.text'))
         else:
@@ -177,7 +177,7 @@ def convert_recipes(input_paths: List[str], output_dir: str = "converted"):
     
     print(f"Verarbeite {len(files_to_process)} Rezept(e)...\n")
     
-    # Verarbeite jede Datei
+    # Process each file
     success_count = 0
     error_count = 0
     
@@ -185,16 +185,16 @@ def convert_recipes(input_paths: List[str], output_dir: str = "converted"):
         try:
             print(f"Konvertiere: {filepath.name}")
             
-            # Parse Rezept
+            # Parse recipe
             result = parse_recipe_file(filepath)
             recipe_data = result["recipe"]
             dir_name = result["dir_name"]
             
-            # Erstelle Rezept-Verzeichnis
+            # Create recipe directory
             recipe_dir = output_path / dir_name
             recipe_dir.mkdir(exist_ok=True)
             
-            # Speichere recipe.json
+            # Save recipe.json
             json_path = recipe_dir / "recipe.json"
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(recipe_data, f, ensure_ascii=False, indent=2)
@@ -212,7 +212,7 @@ def convert_recipes(input_paths: List[str], output_dir: str = "converted"):
             print(f"  ✗ Fehler bei {filepath.name}: {str(e)}\n")
             error_count += 1
     
-    # Zusammenfassung
+    # Summary
     print("=" * 60)
     print(f"Konvertierung abgeschlossen:")
     print(f"  Erfolgreich: {success_count}")
@@ -222,7 +222,7 @@ def convert_recipes(input_paths: List[str], output_dir: str = "converted"):
 
 
 def main():
-    """Hauptfunktion mit Kommandozeilen-Unterstützung"""
+    """Main function with command line support"""
     if len(sys.argv) < 2:
         print("Rezept-Konverter")
         print("=" * 60)
@@ -237,7 +237,7 @@ def main():
         print()
         sys.exit(1)
     
-    # Parse Argumente
+    # Parse arguments
     args = sys.argv[1:]
     output_dir = "converted"
     input_paths = []
@@ -255,7 +255,7 @@ def main():
         print("Fehler: Keine Eingabedateien angegeben")
         sys.exit(1)
     
-    # Konvertiere Rezepte
+    # Convert recipes
     convert_recipes(input_paths, output_dir)
 
 
